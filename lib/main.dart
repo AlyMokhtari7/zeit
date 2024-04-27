@@ -1,4 +1,5 @@
 import 'dart:convert';
+// import 'dart:html';
 import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,9 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:zeit/styled_text.dart';
+
+// Material You dynamic color
+import 'package:dynamic_color/dynamic_color.dart';
 
 import 'package:zeit/providers/task_provider.dart';
 
@@ -25,9 +29,11 @@ class MainApp extends ConsumerStatefulWidget {
 
 class _MainAppState extends ConsumerState<MainApp> {
   var taskRepo = [
-    'Hi',
-    'Hola',
-    'Hallo',
+    ['Hi', 'Task'],
+    ['Hola', 'Task'],
+    ['sect1', 'Section'],
+    ['Hallo', 'Task'],
+    ['sect2', 'Section'],
   ];
   var finishedTasksRepo = [];
 
@@ -48,7 +54,7 @@ class _MainAppState extends ConsumerState<MainApp> {
 
   void addNewTask(String label) {
     setState(() {
-      taskRepo.add(label);
+      taskRepo.add([label, "task"]);
       submitController.text = "";
     });
   }
@@ -73,11 +79,12 @@ class _MainAppState extends ConsumerState<MainApp> {
     );
 
     return MaterialApp(
+      theme: ThemeData(useMaterial3: true, primarySwatch: Colors.deepOrange),
       home: Scaffold(
-        backgroundColor: Colors.deepOrange[100],
+        // backgroundColor: Color.fromARGB(255, 34, 40, 49),
         appBar: AppBar(
-            title: const Text("Zeit"),
-            backgroundColor: Colors.deepOrangeAccent[100],
+            // title: const Text("Zeit"),
+            // backgroundColor: Color.fromARGB(255, 34, 40, 49),
             titleTextStyle: const TextStyle(
                 fontSize: 25,
                 color: Colors.black,
@@ -92,36 +99,60 @@ class _MainAppState extends ConsumerState<MainApp> {
               width: 250,
               child: LinearProgressIndicator(
                 value: 50.0,
-                backgroundColor: Colors.deepOrange,
+                // backgroundColor: Color.fromARGB(255, 52, 73, 85),
                 minHeight: 20,
                 borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.deepOrange,
+                // color: Color.fromARGB(255, 52, 73, 85)
               ),
             ),
             const SizedBox(
               height: 10,
             ),
-            const Text(
-              "Ongoing Tasks",
-              textAlign: TextAlign.start,
-            ),
             ReorderableListView(
-                shrinkWrap: true,
-                padding: const EdgeInsets.all(10),
                 onReorder: (oldIndex, newIndex) =>
                     update_myTiles_index(oldIndex, newIndex),
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(10),
                 children: [
                   for (final tile in taskRepo)
-                    TaskWidgets(key: ValueKey(tile), label: tile)
+                    if (tile[1] == 'Task')
+                      TaskWidgets(
+                        label: tile[0],
+                        key: ValueKey(tile[0]),
+                      )
+                    else
+                      SizedBox(
+                        height: 30,
+                        key: ValueKey(tile[0]),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              tile[0],
+                            ),
+                            const Divider(
+                              color: Colors.grey,
+                              height: 1,
+                            )
+                          ],
+                        ),
+                      ),
                 ]),
-            const Text(
-              "Already done Tasks",
-              textAlign: TextAlign.start,
+            const Divider(
+              height: 10,
+              color: Colors.black,
+              indent: 70,
+              endIndent: 70,
             ),
             ListView(
                 shrinkWrap: true,
                 padding: const EdgeInsets.all(10),
                 children: [
+                  const Text(
+                    "Already done hey Tasks",
+                    textAlign: TextAlign.start,
+                  ),
                   for (final tile in finishedTasksRepo)
                     TaskWidgets(key: ValueKey(tile), label: tile)
                 ]),
@@ -160,7 +191,7 @@ class _TaskWidgetsState extends State<TaskWidgets> {
       margin: const EdgeInsets.all(10),
       child: ListTile(
         leading: Checkbox(
-          activeColor: Colors.deepOrange,
+          // activeColor: Colors.deepOrange,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           value: _value,
@@ -171,11 +202,11 @@ class _TaskWidgetsState extends State<TaskWidgets> {
         ),
         title: Text(widget.label),
         dense: true,
-        // tileColor: Colors.deepOrange[200],
+        // tileColor: Colors.deepOrangeAccent[100],
         textColor: Colors.black,
-        // contentPadding: const EdgeInsets.all(10),
-        // shape:
-        // RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        contentPadding: const EdgeInsets.all(10),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       ),
     );
   }
